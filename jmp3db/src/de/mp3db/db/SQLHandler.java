@@ -20,9 +20,12 @@ import de.mp3db.util.Tag;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: SQLHandler.java,v 1.3 2004/08/24 12:45:33 einfachnuralex Exp $
+ *      @version $Id: SQLHandler.java,v 1.4 2004/08/24 14:44:29 einfachnuralex Exp $
  *  
  *      $Log: SQLHandler.java,v $
+ *      Revision 1.4  2004/08/24 14:44:29  einfachnuralex
+ *      addSong(String) überarbeitet
+ *
  *      Revision 1.3  2004/08/24 12:45:33  einfachnuralex
  *      CVS Kommentare eingefügt
  *      addSong(MP3Song)
@@ -460,15 +463,16 @@ public class SQLHandler implements DBHandler {
 	}
 	
 	public void addSong(String fileName) {
-		
-		int filehash = new File(fileName).hashCode();
-		long filemod = new File(fileName).lastModified();
 		int count = 0;
 		boolean exist = false;
 		
+		Tag newFile = new Tag(fileName);
+		MP3Song newSong = new MP3Song();
+		newSong = newFile.getSong();
+		
 		// Hashcode in der Datenbank suchen.
 		try {
-			getFilesByHashStatement.setInt(1, filehash);
+			getFilesByHashStatement.setInt(1, newSong.getHashCode());
 			ResultSet files = getFilesByHashStatement.executeQuery();
 
 			while(files.next()) {
@@ -477,8 +481,9 @@ public class SQLHandler implements DBHandler {
 				}
 				count++;
 				
-				if(new File(fileName).getName() == files.getString(2)) {
-					exist = true;
+				if(new File(fileName).getName() == (new File(files.getString(2)).getName())) {
+					//exist = true;
+					//newSong.setID(files.getInt(1));
 				}
 			}
 			files.close();
@@ -489,27 +494,11 @@ public class SQLHandler implements DBHandler {
 
 		if(exist) {
 			// Change Song
+			//this.changeSong(newSong);
 		}
 		else {
 			// Neuen MP3Song anlegen
-			Tag newFile = new Tag(fileName);
-			
-			MP3Song newSong = new MP3Song();
 			newSong.setID(this.getMaxSongId()+1);
-			newSong.setTitle(newFile.getTitle());
-			newSong.setArtist(newFile.getArtist());
-			newSong.setAlbum(newFile.getAlbum());
-			newSong.setYear(newFile.getYear());
-			newSong.setGenre(newFile.getGenre());
-			newSong.setTrackNo(newFile.getTrackNo());
-			newSong.setBitrate(newFile.getBitrate());
-			newSong.setLength(newFile.getLength());
-			newSong.setFileSize(newFile.getFileSize());
-			newSong.setFileName(newFile.getFileName());
-			newSong.setLastModified(newFile.getLastModified());
-			newSong.setHashCode(filehash);
-			newSong.setCodec(newFile.getCodec());
-						
 			addSong(newSong);
 		}
 	}
@@ -660,6 +649,7 @@ public class SQLHandler implements DBHandler {
 			addSongStatement.setInt(13, song.getHashCode());
 			
 			addSongStatement.execute();
+			addSongStatement.clearParameters();
 		}
 		catch(SQLException ex) {
 			System.out.println(ex);
