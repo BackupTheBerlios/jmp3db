@@ -6,9 +6,12 @@ import java.util.Comparator;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: MP3Song.java,v 1.3 2004/09/01 09:28:02 einfachnuralex Exp $
+ *      @version $Id: MP3Song.java,v 1.4 2004/10/29 10:59:37 einfachnuralex Exp $
  *  
  *      $Log: MP3Song.java,v $
+ *      Revision 1.4  2004/10/29 10:59:37  einfachnuralex
+ *      toString Methode geändert
+ *
  *      Revision 1.3  2004/09/01 09:28:02  einfachnuralex
  *      Feld int genreNo hinzugefügt
  *      kompett überarbeitet
@@ -116,7 +119,7 @@ public class MP3Song implements Comparator {
     }
     
     public void setGenre(String genre) {
-        this.genre = genre;
+   		this.genre = genre;
     }
     
     public String getGenre() {
@@ -207,7 +210,7 @@ public class MP3Song implements Comparator {
     }
     
     public int getCodec() {
-    	return codec;
+    	return this.codec;
     }
     
     // Vergleichsmethoden
@@ -254,6 +257,6 @@ public class MP3Song implements Comparator {
      * Überschreiben von java.lang.Object.toString();
      *********************************************************************************/
     public String toString() { 
-        return this.title;
+        return title + " " + artist + " " + album + " " + genre + " " + year;
     }
 }
