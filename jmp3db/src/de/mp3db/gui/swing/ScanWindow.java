@@ -81,6 +81,7 @@ public class ScanWindow extends JDialog implements ScanListener, ActionListener 
 			bar.setMaximum(event.getMax()); 		
 		}
 		bar.setValue(event.getPos());
+		bar.setString(event.getPos() + " / " + event.getMax());
 		label.setText("FileName: " + event.getFileName());
 		if(event.getMax() == event.getPos()) {
 			DBTree.getInstance().reloadDB();
