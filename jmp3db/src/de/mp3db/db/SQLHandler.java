@@ -20,9 +20,12 @@ import de.mp3db.util.Tag;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: SQLHandler.java,v 1.5 2004/08/25 09:45:27 einfachnuralex Exp $
+ *      @version $Id: SQLHandler.java,v 1.6 2004/08/25 15:15:48 einfachnuralex Exp $
  *  
  *      $Log: SQLHandler.java,v $
+ *      Revision 1.6  2004/08/25 15:15:48  einfachnuralex
+ *      changeSong(MP3Song) implemntiert
+ *
  *      Revision 1.5  2004/08/25 09:45:27  einfachnuralex
  *      parseSong / parseArtist / parseAlbum / parseGenre / parseYear Methoden implementiert
  *      SQL Querys überarbeitet
@@ -70,6 +73,7 @@ public class SQLHandler implements DBHandler {
 	private static PreparedStatement getGenreByNameStatement;
 	private static PreparedStatement addGenreStatement;
 	private static PreparedStatement getArtistByIDStatement;
+	private static PreparedStatement updateSongStatement;
 	
 	private Connection dbConnection;
 
@@ -398,6 +402,8 @@ public class SQLHandler implements DBHandler {
 				"LEFT JOIN years ON (songs.year = years.id) " +
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
 				"WHERE songs.genre = ? " +				"ORDER BY genres.genretext");
+			updateSongStatement = dbConnection.prepareStatement(
+				"UPDATE songs SET title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=? WHERE id=?");
 			
 			// ARTIST Statements
 			getArtistsStatement = dbConnection.prepareStatement(
@@ -622,7 +628,7 @@ public class SQLHandler implements DBHandler {
 					addAlbumStatement.setInt(3, artistId);
 					addAlbumStatement.setInt(4, yearId);
 					addAlbumStatement.setInt(5, 126);
-					addAlbumStatement.setInt(6, 1);
+					addAlbumStatement.setInt(6, 0);
 					addAlbumStatement.setInt(7, 0);
 					addAlbumStatement.execute();
 				}
@@ -663,7 +669,7 @@ public class SQLHandler implements DBHandler {
 			addSongStatement.setInt(9, song.getLength());
 			addSongStatement.setLong(10, song.getFileSize());
 			addSongStatement.setString(11, song.getFileName());
-			addSongStatement.setInt(12, (int)song.getLastModified());
+			addSongStatement.setLong(12, song.getLastModified());
 			addSongStatement.setInt(13, song.getHashCode());
 			
 			addSongStatement.execute();
@@ -675,8 +681,129 @@ public class SQLHandler implements DBHandler {
 	}
 	
 	public void changeSong(MP3Song changedSong) {
-		// TODO Auto-generated method stub
+		int artistId = 0; 
+		int albumId = 0; 
+		int yearId = 0;
+		int genreId = 0;
+		
+		//	SET (id), title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=? WHERE id=?
+		if(changedSong != null) {
+			try {
+				getSongByIDStatement.setInt(1, changedSong.getID());
+				ResultSet result = getSongByIDStatement.executeQuery();
+				MP3Song tmp = (MP3Song)parseSong(result).get(0);
+				
+				// Ist der Artist geaendert
+				if(!changedSong.getArtist().equals(tmp.getArtist())) {
+					getArtistByNameStatement.setString(1, changedSong.getArtist());
+					ResultSet artist = getArtistByNameStatement.executeQuery();
+					
+					// Ist der Artist schon vorhanden?
+					if(artist.next()) {
+						artistId = artist.getInt(1);
+					}
+					// Neuer Artist wird angelegt
+					else {
+						artistId = getMaxArtistId()+1;
+						addArtistStatement.setInt(1, artistId);
+						addArtistStatement.setString(2, changedSong.getArtist());
+						addArtistStatement.setInt(3, 126);
+						addArtistStatement.execute();
+					}
+					artist.close();
+				}
+				else {
+					artistId = result.getInt(3);
+				}
 
+				// Ist das Jahr geaendert?
+				if(changedSong.getYear() != tmp.getYear()) {
+					getYearByNumberStatement.setInt(1, changedSong.getYear());
+					ResultSet years = getYearByNumberStatement.executeQuery();
+					
+					if(years.next()) {
+						yearId = years.getInt(1);
+					}
+					else {
+						yearId = getMaxYearId()+1;
+						addYearStatement.setInt(1, yearId);
+						addYearStatement.setInt(2, changedSong.getYear());
+						addYearStatement.execute();
+					}
+					years.close();
+				}
+				else {
+					yearId = result.getInt(5);
+				}
+				
+				// Ist das Album geaendert?
+				if(!changedSong.getAlbum().equals(tmp.getAlbum())) {
+					getAlbumByNameStatement.setString(1, changedSong.getAlbum());
+					ResultSet album = getArtistByNameStatement.executeQuery();
+					
+					if(album.next()) {
+						albumId = album.getInt(1);
+					}
+					else {
+						albumId = getMaxAlbumId()+1;
+						addAlbumStatement.setInt(1, albumId);
+						addAlbumStatement.setString(2, changedSong.getAlbum());
+						addAlbumStatement.setInt(3, artistId);
+						addAlbumStatement.setInt(4, yearId);
+						addAlbumStatement.setInt(5, 126);
+						addAlbumStatement.setInt(6, 0);
+						addAlbumStatement.setInt(7, 0);
+						addAlbumStatement.execute();
+					}
+					album.close();
+				}
+				else {
+					albumId = result.getInt(4);
+				}
+				
+				// Hat sich das Genre geaendert?
+				if(!changedSong.getGenre().equals(tmp.getGenre())) {
+					getGenreByNameStatement.setString(1, changedSong.getGenre());
+					ResultSet genres = getGenreByNameStatement.executeQuery();
+					
+					// Falls Genre schon vorhanden, ID uebernehmen
+					if(genres.next()) {
+						genreId = genres.getInt(1);
+					}
+					// Wenn nicht vorhanden, anlegen und ID uebernehmen
+					else {
+						genreId = getMaxGenreId()+1;
+						addGenreStatement.setInt(1, genreId);
+						addGenreStatement.setInt(2, 0);
+						addGenreStatement.setString(3, changedSong.getGenre());
+						addGenreStatement.execute();
+					}
+					genres.close();
+				}
+				else {
+					genreId = result.getInt(6);
+				}
+				
+				updateSongStatement.setString(1, changedSong.getTitle());
+				updateSongStatement.setInt(2, artistId);
+				updateSongStatement.setInt(3, albumId);
+				updateSongStatement.setInt(4, yearId);
+				updateSongStatement.setInt(5, genreId);
+				updateSongStatement.setInt(7, changedSong.getTrackNo());
+				updateSongStatement.setInt(8, changedSong.getBitrate());
+				updateSongStatement.setInt(9, changedSong.getLength());
+				updateSongStatement.setLong(10, changedSong.getFileSize());
+				updateSongStatement.setString(11, changedSong.getFileName());
+				updateSongStatement.setLong(12, changedSong.getLastModified());
+				updateSongStatement.setInt(13, changedSong.getHashCode());
+				
+				updateSongStatement.execute();
+				updateSongStatement.clearParameters();
+			}
+			catch(SQLException ex) {
+				System.out.println("Error (changeSong) : " + ex);
+			}
+		}
 	}
 
 	public boolean clearDB() {
