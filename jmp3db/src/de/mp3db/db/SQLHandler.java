@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import de.mp3db.config.ConfigProperty;
 import de.mp3db.util.MP3Album;
 import de.mp3db.util.MP3Artist;
 import de.mp3db.util.MP3Genre;
@@ -20,9 +19,12 @@ import de.mp3db.util.Tag;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: SQLHandler.java,v 1.6 2004/08/25 15:15:48 einfachnuralex Exp $
+ *      @version $Id: SQLHandler.java,v 1.7 2004/10/12 13:58:35 einfachnuralex Exp $
  *  
  *      $Log: SQLHandler.java,v $
+ *      Revision 1.7  2004/10/12 13:58:35  einfachnuralex
+ *      parseSong() geaendert
+ *
  *      Revision 1.6  2004/08/25 15:15:48  einfachnuralex
  *      changeSong(MP3Song) implemntiert
  *
@@ -80,11 +82,11 @@ public class SQLHandler implements DBHandler {
 	public SQLHandler() {
 		System.out.println("Connecting to Database");
 		try {
-        	ConfigProperty cp = new ConfigProperty(System.getProperty("user.home") + "/.jmp3db/mp3db.conf");
-        	String url = cp.getDBUrl("db");
-        	String driver = cp.getDBDriver("db");
-        	String user = cp.getDBUser("db");
-        	String pw = cp.getDBPassword("db");
+        	//ConfigProperty cp = new ConfigProperty(System.getProperty("user.home") + "/.jmp3db/mp3db.conf");
+        	String url = "jdbc:hsqldb:" + System.getProperty("user.home") + "/.jmp3db/data/jmp3db";
+        	String driver = "org.hsqldb.jdbcDriver";
+        	String user = "sa";
+        	String pw = "";
         	
             Class.forName(driver);
             this.dbConnection = DriverManager.getConnection(url,user,pw);
@@ -100,7 +102,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getSongByIDStatement.setInt(1, id);
 			ResultSet result = getSongsByArtistStatement.executeQuery();
-			return (MP3Song)parseSong(result).get(0);
+			MP3Song tmp = (MP3Song)parseSong(result).get(0);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getSong) : " + ex); 
@@ -112,7 +116,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getArtistByIDStatement.setInt(1, id);
 			ResultSet result = getSongsByArtistStatement.executeQuery();
-			return (MP3Artist)parseArtist(result).get(0);
+			MP3Artist tmp = (MP3Artist)parseArtist(result).get(0);
+			result.close();			
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getArtist) : " + ex); 
@@ -124,7 +130,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getAlbumByIDStatement.setInt(1, id);
 			ResultSet result = getSongsByArtistStatement.executeQuery();
-			return (MP3Album)parseArtist(result).get(0);
+			MP3Album tmp = (MP3Album)parseArtist(result).get(0);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getAlbum) : " + ex); 
@@ -136,7 +144,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getSongsByArtistStatement.setInt(1, artistId);
 			ResultSet result = getSongsByArtistStatement.executeQuery();
-			return parseSong(result);
+			Vector tmp = parseSong(result); 
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getSongsByArtist) : " + ex); 
@@ -148,7 +158,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getSongsByAlbumStatement.setInt(1, albumId);
 			ResultSet result = getSongsByAlbumStatement.executeQuery();
-			return parseSong(result);
+			Vector tmp = parseSong(result); 
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getSongsByAlbum) : " + ex); 
@@ -160,7 +172,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getSongsByGenreStatement.setInt(1, genreId);
 			ResultSet result = getSongsByGenreStatement.executeQuery();
-			return parseSong(result);
+			Vector tmp = parseSong(result); 
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getSongsByGenre) :" + ex);
@@ -172,7 +186,9 @@ public class SQLHandler implements DBHandler {
 		try {
 			getSongsByYearStatement.setInt(1, yearId);
 			ResultSet result = getSongsByYearStatement.executeQuery();
-			return parseSong(result);
+			Vector tmp = parseSong(result); 
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getSongsByYear) :" + ex);
@@ -183,7 +199,9 @@ public class SQLHandler implements DBHandler {
 	public Vector getAllSongs() {
 		try {
 			ResultSet result = getSongsStatement.executeQuery();
-			return parseSong(result);
+			Vector tmp = parseSong(result);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getAllSongs) :" + ex);
@@ -194,7 +212,9 @@ public class SQLHandler implements DBHandler {
 	public Vector getAllArtists() {
 		try {
 			ResultSet result = getArtistsStatement.executeQuery();
-			return parseArtist(result);
+			Vector tmp = parseArtist(result);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getAllArtists) : " + ex); 
@@ -205,7 +225,9 @@ public class SQLHandler implements DBHandler {
 	public Vector getAllAlbums() {
 		try {
 			ResultSet result = getAlbumsStatement.executeQuery();
-			return parseAlbum(result);		
+			Vector tmp = parseAlbum(result);
+			result.close();
+			return 	tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getAllAlbums) : " + ex);
@@ -216,7 +238,9 @@ public class SQLHandler implements DBHandler {
 	public Vector getAllGenres() {
 		try {
 			ResultSet result = getGenresStatement.executeQuery();
-			return parseGenre(result);
+			Vector tmp = parseGenre(result);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getAllGenres) : " + ex);
@@ -227,7 +251,9 @@ public class SQLHandler implements DBHandler {
 	public Vector getAllYears() {
 		try {
 			ResultSet result = getYearsStatement.executeQuery();
-			return parseYear(result);
+			Vector tmp = parseYear(result);
+			result.close();
+			return tmp;
 		}
 		catch(SQLException ex) {
 			System.out.println("SQLError (getAllYears) : " + ex);
@@ -252,10 +278,15 @@ public class SQLHandler implements DBHandler {
 				song.setFileSize(result.getLong(10));
 				song.setFileName(result.getString(11));
 				song.setLastModified(result.getLong(12));
+				if(result.getString(11).substring(result.getString(11).length()-4, result.getString(11).length()).equalsIgnoreCase("mp3")) {
+					song.setCodec(MP3Song.MP3);
+				}
+				if(result.getString(11).substring(result.getString(11).length()-4, result.getString(11).length()).equalsIgnoreCase("ogg")) {
+					song.setCodec(MP3Song.OGG);
+				}
 				
 				songs.add(song);
 			}
-			result.close();
 			songs.trimToSize();
 			return songs;
 		}
@@ -280,7 +311,6 @@ public class SQLHandler implements DBHandler {
 				
 				albums.add(a);
 			}
-			result.close();
 			albums.trimToSize();
 			return albums;		
 		}
@@ -300,7 +330,6 @@ public class SQLHandler implements DBHandler {
 				artist.setGenre(result.getString(3));
 				artists.add(artist);
 			}
-			result.close();
 			artists.trimToSize();
 			return artists;
 		}
@@ -321,7 +350,6 @@ public class SQLHandler implements DBHandler {
 				
 				genres.add(y);
 			}
-			result.close();
 			genres.trimToSize();
 			return genres;
 		}
@@ -341,7 +369,6 @@ public class SQLHandler implements DBHandler {
 				
 				years.add(y);
 			}
-			result.close();
 			years.trimToSize();
 			return years;
 		}
@@ -355,7 +382,7 @@ public class SQLHandler implements DBHandler {
 		try {
 			// SONG Statements
 			getSongsStatement = dbConnection.prepareStatement(
-				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+					"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
@@ -365,21 +392,20 @@ public class SQLHandler implements DBHandler {
 				"INSERT INTO songs (id, title, artist, album, year, genre, trackno, bitrate, length, filesize, filename, lastmodified, hashcode) "+
 				"values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			getSongByIDStatement = dbConnection.prepareStatement(
-				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
 				"LEFT JOIN years ON (songs.year = years.id) " +
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
-				"WHERE songs.id = ? " +				"ORDER BY songs.title");
-			getSongsByArtistStatement = dbConnection.prepareStatement("" +				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+				"WHERE songs.id = ? ");			getSongsByArtistStatement = dbConnection.prepareStatement("" +					"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
 				"LEFT JOIN years ON (songs.year = years.id) " +
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
 				"WHERE songs.artist = ? " +				"ORDER BY songs.title ASC"); 
-			getSongsByAlbumStatement = dbConnection.prepareStatement("" +				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+			getSongsByAlbumStatement = dbConnection.prepareStatement("" +					"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
@@ -387,7 +413,7 @@ public class SQLHandler implements DBHandler {
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
 				"WHERE songs.album = ? " +				"ORDER BY albums.name");
 			getSongsByYearStatement = dbConnection.prepareStatement(
-				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+					"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
@@ -395,7 +421,7 @@ public class SQLHandler implements DBHandler {
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
 				"WHERE songs.year = ? " +				"ORDER BY years.number");
 			getSongsByGenreStatement = dbConnection.prepareStatement(
-				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
+				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified, songs.hashcode "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
@@ -403,7 +429,7 @@ public class SQLHandler implements DBHandler {
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
 				"WHERE songs.genre = ? " +				"ORDER BY genres.genretext");
 			updateSongStatement = dbConnection.prepareStatement(
-				"UPDATE songs SET title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=? WHERE id=?");
+				"UPDATE songs SET title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=?, hashcode=? WHERE id=?");
 			
 			// ARTIST Statements
 			getArtistsStatement = dbConnection.prepareStatement(
@@ -492,9 +518,8 @@ public class SQLHandler implements DBHandler {
 		int count = 0;
 		boolean exist = false;
 		
-		Tag newFile = new Tag(fileName);
 		MP3Song newSong = new MP3Song();
-		newSong = newFile.getSong();
+		newSong = new Tag(fileName).getSong();
 		
 		// Hashcode in der Datenbank suchen.
 		try {
@@ -508,7 +533,7 @@ public class SQLHandler implements DBHandler {
 				count++;
 				
 				if(new File(fileName).getName() == (new File(files.getString(2)).getName())) {
-					//exist = true;
+					exist = true;
 					//newSong.setID(files.getInt(1));
 				}
 			}
@@ -564,28 +589,6 @@ public class SQLHandler implements DBHandler {
 				}
 				artists.close();
 			}
-			
-			/*
-			// Falls kein Artist vorhanden, 
-			else {
-				getArtistByNameStatement.setString(1, "Unknown");
-				ResultSet artists = getArtistByNameStatement.executeQuery();
-				
-				// Artist 'Unknown' uebernehmen,
-				if(artists.next()) {
-					artistId = artists.getInt(1);
-				}
-				// falls nicht vorhanden, anlegen und ID uebernehmen
-				else {
-					artistId = getMaxArtistId()+1;
-					addArtistStatement.setInt(1, artistId);
-					addArtistStatement.setString(2, "Unknown");
-					addArtistStatement.setInt(3, 126);
-					addArtistStatement.execute();
-				}
-				artists.close();
-			}
-			*/
 			addSongStatement.setInt(3, artistId);
 			
 			// Jahr in der Datenbank suchen
@@ -653,7 +656,7 @@ public class SQLHandler implements DBHandler {
 				else {
 					genreId = getMaxGenreId()+1;
 					addGenreStatement.setInt(1, genreId);
-					addGenreStatement.setInt(2, 0);
+					addGenreStatement.setInt(2, song.getGenreNo());
 					addGenreStatement.setString(3, song.getGenre());
 					addGenreStatement.execute();
 				}
@@ -686,24 +689,28 @@ public class SQLHandler implements DBHandler {
 		int yearId = 0;
 		int genreId = 0;
 		
-		//	SET (id), title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=? WHERE id=?
+		//	SET (id), title=?, artist=?, album=?, year=?, genre=?, trackno=?, bitrate=?, length=?, filesize=?, filename=?, lastmodified=?, hashcode=?  WHERE id=?
 		if(changedSong != null) {
 			try {
 				getSongByIDStatement.setInt(1, changedSong.getID());
 				ResultSet result = getSongByIDStatement.executeQuery();
 				MP3Song tmp = (MP3Song)parseSong(result).get(0);
+				System.out.println(changedSong.getID() + "  " + tmp.getID());
 				
 				// Ist der Artist geaendert
 				if(!changedSong.getArtist().equals(tmp.getArtist())) {
+					System.out.println("Artist hat sich geändert : " + changedSong.getArtist());
 					getArtistByNameStatement.setString(1, changedSong.getArtist());
 					ResultSet artist = getArtistByNameStatement.executeQuery();
 					
 					// Ist der Artist schon vorhanden?
 					if(artist.next()) {
+						System.out.println("Neuer Artist schon vorhanden.");
 						artistId = artist.getInt(1);
 					}
 					// Neuer Artist wird angelegt
 					else {
+						System.out.println("Neuer Artist wird angelegt");
 						artistId = getMaxArtistId()+1;
 						addArtistStatement.setInt(1, artistId);
 						addArtistStatement.setString(2, changedSong.getArtist());
@@ -713,18 +720,33 @@ public class SQLHandler implements DBHandler {
 					artist.close();
 				}
 				else {
-					artistId = result.getInt(3);
+					System.out.println("Artist hat sich nicht geändert.");
+					getArtistByNameStatement.setString(1, tmp.getArtist());
+					ResultSet artist = getArtistByNameStatement.executeQuery();
+					
+					// Ist der Artist schon vorhanden?
+					if(artist.next()) {
+						artistId = artist.getInt(1);
+					}
+					else {
+						System.out.println("Alter Artist ist nicht mehr vorhanden.");
+						artistId = 0;
+					}
+					artist.close();
 				}
 
 				// Ist das Jahr geaendert?
 				if(changedSong.getYear() != tmp.getYear()) {
+					System.out.println("Jahr hat sich geändert : " + changedSong.getYear());
 					getYearByNumberStatement.setInt(1, changedSong.getYear());
 					ResultSet years = getYearByNumberStatement.executeQuery();
 					
 					if(years.next()) {
+						System.out.println("Neues Jahr schon vorhanden.");
 						yearId = years.getInt(1);
 					}
 					else {
+						System.out.println("Neues Jahr wird angelegt.");
 						yearId = getMaxYearId()+1;
 						addYearStatement.setInt(1, yearId);
 						addYearStatement.setInt(2, changedSong.getYear());
@@ -733,15 +755,28 @@ public class SQLHandler implements DBHandler {
 					years.close();
 				}
 				else {
-					yearId = result.getInt(5);
+					System.out.println("Jahr hat sich nicht geändert.");
+					getYearByNumberStatement.setInt(1, tmp.getYear());
+					ResultSet years = getYearByNumberStatement.executeQuery();
+					
+					if(years.next()) {
+						yearId = years.getInt(1);
+					}
+					else {
+						System.out.println("Altes Jahr ist nicht mehr vorhanden.");
+						yearId = 0;
+					}
+					years.close();
 				}
 				
 				// Ist das Album geaendert?
 				if(!changedSong.getAlbum().equals(tmp.getAlbum())) {
+					System.out.println("Album hat sich geändert : " + changedSong.getAlbum());
 					getAlbumByNameStatement.setString(1, changedSong.getAlbum());
 					ResultSet album = getArtistByNameStatement.executeQuery();
 					
 					if(album.next()) {
+						System.out.println("Neues Album schon vorhanden.");
 						albumId = album.getInt(1);
 					}
 					else {
@@ -758,11 +793,22 @@ public class SQLHandler implements DBHandler {
 					album.close();
 				}
 				else {
-					albumId = result.getInt(4);
+					getAlbumByNameStatement.setString(1, tmp.getAlbum());
+					ResultSet album = getArtistByNameStatement.executeQuery();
+					
+					if(album.next()) {
+						albumId = album.getInt(1);
+					}
+					else {
+						System.out.println("Altes Album ist nicht mehr vorhanden.");
+						albumId = 0;
+					}
+					album.close();
 				}
 				
 				// Hat sich das Genre geaendert?
 				if(!changedSong.getGenre().equals(tmp.getGenre())) {
+					System.out.println("Genre hat sich geändert : " + changedSong.getGenre());
 					getGenreByNameStatement.setString(1, changedSong.getGenre());
 					ResultSet genres = getGenreByNameStatement.executeQuery();
 					
@@ -781,7 +827,16 @@ public class SQLHandler implements DBHandler {
 					genres.close();
 				}
 				else {
-					genreId = result.getInt(6);
+					getGenreByNameStatement.setString(1, tmp.getGenre());
+					ResultSet genres = getGenreByNameStatement.executeQuery();
+					
+					if(genres.next()) {
+						genreId = genres.getInt(1);
+					}
+					else {
+						System.out.println("Altes Genre ist nicht mehr vorhanden.");
+						genreId = 0;
+					}
 				}
 				
 				updateSongStatement.setString(1, changedSong.getTitle());
@@ -789,19 +844,23 @@ public class SQLHandler implements DBHandler {
 				updateSongStatement.setInt(3, albumId);
 				updateSongStatement.setInt(4, yearId);
 				updateSongStatement.setInt(5, genreId);
-				updateSongStatement.setInt(7, changedSong.getTrackNo());
-				updateSongStatement.setInt(8, changedSong.getBitrate());
-				updateSongStatement.setInt(9, changedSong.getLength());
-				updateSongStatement.setLong(10, changedSong.getFileSize());
-				updateSongStatement.setString(11, changedSong.getFileName());
-				updateSongStatement.setLong(12, changedSong.getLastModified());
-				updateSongStatement.setInt(13, changedSong.getHashCode());
+				updateSongStatement.setInt(6, changedSong.getTrackNo());
+				updateSongStatement.setInt(7, changedSong.getBitrate());
+				updateSongStatement.setInt(8, changedSong.getLength());
+				updateSongStatement.setLong(9, changedSong.getFileSize());
+				updateSongStatement.setString(10, changedSong.getFileName());
+				updateSongStatement.setLong(11, changedSong.getLastModified());
+				updateSongStatement.setInt(12, changedSong.getHashCode());
+				
+				updateSongStatement.setInt(13, changedSong.getID());
 				
 				updateSongStatement.execute();
 				updateSongStatement.clearParameters();
+				result.close();
+				System.out.println("Fertig");
 			}
 			catch(SQLException ex) {
-				System.out.println("Error (changeSong) : " + ex);
+				System.out.println("Error (changeSong) : " + ex.getMessage());
 			}
 		}
 	}
