@@ -512,7 +512,7 @@ public class SQLHandler implements DBHandler {
 			newSong.setTrackNo(newFile.getTrackNo());
 			newSong.setBitrate(newFile.getBitrate());
 			newSong.setLength(newFile.getLength());
-			newSong.setFileSize(newFile.getLength());
+			newSong.setFileSize(newFile.getFileSize());
 			newSong.setFileName(newFile.getFileName());
 			newSong.setLastModified(newFile.getLastModified());
 			newSong.setHashCode(filehash);
