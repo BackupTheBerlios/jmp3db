@@ -88,13 +88,16 @@ public class MP3DBListener implements ActionListener, TreeSelectionListener, Mou
 		}
 		// Edititems
 		else if(command.equals("saveSong")) {
-			
+			DBTree.getInstance().save(MultiPanel.getInstance().changedSong());
 		}
 		else if(command.equals("abortEdit")) {
 			
 		}
 		else if(command.equals("resetEdit")) {
 			MultiPanel.getInstance().resetEdit();
+		}
+		else if(command.equals("Search")) {
+			MultiPanel.getInstance().search();
 		}
 	}
 
