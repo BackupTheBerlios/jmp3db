@@ -26,6 +26,8 @@
 
 // 13.10.04/13:00 : Umstieg auf Basicplayer2.3 API von javazoom.net
 
+// 28.10.04/17:00 : Suchfunktion implementieren
+
 @DB:
 
 !! - addSong und changeSong die Möglichkeit geben mehrere gleichnamige Alben anlegen zu können, aber mit unterschiedlichen Interpreten
@@ -82,9 +84,8 @@ Scan Wizard erstellen / optimieren
 
 Panel für MP3 Änderungen, Suche mit Reitern unter der Mainlist / fertigstellen
 
-Suchfunktion implementieren
-
 @ Off Topic
 
 SQL Query Generator
 Ogg Info Libary
+Fuzzy Suche verbessern
