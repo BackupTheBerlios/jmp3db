@@ -20,9 +20,13 @@ import de.mp3db.util.Tag;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: SQLHandler.java,v 1.4 2004/08/24 14:44:29 einfachnuralex Exp $
+ *      @version $Id: SQLHandler.java,v 1.5 2004/08/25 09:45:27 einfachnuralex Exp $
  *  
  *      $Log: SQLHandler.java,v $
+ *      Revision 1.5  2004/08/25 09:45:27  einfachnuralex
+ *      parseSong / parseArtist / parseAlbum / parseGenre / parseYear Methoden implementiert
+ *      SQL Querys überarbeitet
+ *
  *      Revision 1.4  2004/08/24 14:44:29  einfachnuralex
  *      addSong(String) überarbeitet
  *
@@ -30,7 +34,6 @@ import de.mp3db.util.Tag;
  *      CVS Kommentare eingefügt
  *      addSong(MP3Song)
  *      SQL Querys überarbeitet
- *
  *
  */
 public class SQLHandler implements DBHandler {
@@ -46,6 +49,7 @@ public class SQLHandler implements DBHandler {
 	private static PreparedStatement getYearByNumberStatement;
 	private static PreparedStatement addYearStatement;
 	private static PreparedStatement getAlbumByNameStatement;
+	private static PreparedStatement getAlbumByIDStatement;
 	private static PreparedStatement getMaxSongIdStatement;
 	private static PreparedStatement getMaxArtistIdStatement;
 	private static PreparedStatement	getMaxAlbumIdStatement;
@@ -64,14 +68,14 @@ public class SQLHandler implements DBHandler {
 	private static PreparedStatement getYearsStatement;
 	private static PreparedStatement getGenresStatement;
 	private static PreparedStatement getGenreByNameStatement;
-	private static PreparedStatement addGenreStatement;	
+	private static PreparedStatement addGenreStatement;
+	private static PreparedStatement getArtistByIDStatement;
 	
 	private Connection dbConnection;
 
 	public SQLHandler() {
 		System.out.println("Connecting to Database");
 		try {
-
         	ConfigProperty cp = new ConfigProperty(System.getProperty("user.home") + "/.jmp3db/mp3db.conf");
         	String url = cp.getDBUrl("db");
         	String driver = cp.getDBDriver("db");
@@ -89,148 +93,147 @@ public class SQLHandler implements DBHandler {
 	}
 
 	public MP3Song getSong(int id) {
-		return null;
+		try {
+			getSongByIDStatement.setInt(1, id);
+			ResultSet result = getSongsByArtistStatement.executeQuery();
+			return (MP3Song)parseSong(result).get(0);
+		}
+		catch(SQLException ex) { 
+			System.out.println("SQLError (getSong) : " + ex); 
+			return null;
+		}
 	}
 
 	public MP3Artist getArtist(int id) {
-		return null;
+		try {
+			getArtistByIDStatement.setInt(1, id);
+			ResultSet result = getSongsByArtistStatement.executeQuery();
+			return (MP3Artist)parseArtist(result).get(0);
+		}
+		catch(SQLException ex) { 
+			System.out.println("SQLError (getArtist) : " + ex); 
+			return null;
+		}	
 	}
 
 	public MP3Album getAlbum(int id) {
-		return null;
+		try {
+			getAlbumByIDStatement.setInt(1, id);
+			ResultSet result = getSongsByArtistStatement.executeQuery();
+			return (MP3Album)parseArtist(result).get(0);
+		}
+		catch(SQLException ex) { 
+			System.out.println("SQLError (getAlbum) : " + ex); 
+			return null;
+		}	
 	}
 
 	public Vector getSongsByArtist(int artistId) {
-		Vector songs = new Vector();
 		try {
 			getSongsByArtistStatement.setInt(1, artistId);
 			ResultSet result = getSongsByArtistStatement.executeQuery();
-			while(result.next()) {
-				MP3Song song = new MP3Song();
-				song.setID(result.getInt(1));
-				song.setTitle(result.getString(2));
-				song.setArtist(result.getString(3));
-				song.setAlbum(result.getString(4));
-				song.setYear(result.getInt(5));
-				song.setGenre(result.getString(6));
-				song.setTrackNo(result.getInt(7));
-				song.setBitrate(result.getInt(8));
-				song.setLength(result.getInt(9));
-				song.setFileSize(result.getLong(10));
-				song.setFileName(result.getString(11));
-				song.setLastModified(result.getLong(12));
-				
-				songs.add(song);
-			}
-			result.close();
+			return parseSong(result);
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getSongsByArtist) : " + ex); 
 			return null;
 		}
-		return songs;
 	}
 	
 	public Vector getSongsByAlbum(int albumId) {
-		Vector songs = new Vector();
 		try {
 			getSongsByAlbumStatement.setInt(1, albumId);
 			ResultSet result = getSongsByAlbumStatement.executeQuery();
-			while(result.next()) {
-				MP3Song song = new MP3Song();
-				song.setID(result.getInt(1));
-				song.setTitle(result.getString(2));
-				song.setArtist(result.getString(3));
-				song.setAlbum(result.getString(4));
-				song.setYear(result.getInt(5));
-				song.setGenre(result.getString(6));
-				song.setTrackNo(result.getInt(7));
-				song.setBitrate(result.getInt(8));
-				song.setLength(result.getInt(9));
-				song.setFileSize(result.getLong(10));
-				song.setFileName(result.getString(11));
-				song.setLastModified(result.getLong(12));
-				
-				songs.add(song);
-			}
-			result.close();
+			return parseSong(result);
 		}
 		catch(SQLException ex) { 
 			System.out.println("SQLError (getSongsByAlbum) : " + ex); 
 			return null;
 		}
-		return songs;
 	}
 
 	public Vector getSongsByGenre(int genreId) {
-		Vector songs = new Vector();
 		try {
 			getSongsByGenreStatement.setInt(1, genreId);
 			ResultSet result = getSongsByGenreStatement.executeQuery();
-			
-			while(result.next()) {
-				MP3Song song = new MP3Song();
-				song.setID(result.getInt(1));
-				song.setTitle(result.getString(2));
-				song.setArtist(result.getString(3));
-				song.setAlbum(result.getString(4));
-				song.setYear(result.getInt(5));
-				song.setGenre(result.getString(6));
-				song.setTrackNo(result.getInt(7));
-				song.setBitrate(result.getInt(8));
-				song.setLength(result.getInt(9));
-				song.setFileSize(result.getLong(10));
-				song.setFileName(result.getString(11));
-				song.setLastModified(result.getLong(12));
-				
-				songs.add(song);
-			}
-			result.close();
+			return parseSong(result);
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError :" + ex);
+			System.out.println("SQLError (getSongsByGenre) :" + ex);
 			return null;
 		}
-		return songs;
 	}
 
 	public Vector getSongsByYear(int yearId) {
-		Vector songs = new Vector();
 		try {
 			getSongsByYearStatement.setInt(1, yearId);
 			ResultSet result = getSongsByYearStatement.executeQuery();
-			
-			while(result.next()) {
-				MP3Song song = new MP3Song();
-				song.setID(result.getInt(1));
-				song.setTitle(result.getString(2));
-				song.setArtist(result.getString(3));
-				song.setAlbum(result.getString(4));
-				song.setYear(result.getInt(5));
-				song.setGenre(result.getString(6));
-				song.setTrackNo(result.getInt(7));
-				song.setBitrate(result.getInt(8));
-				song.setLength(result.getInt(9));
-				song.setFileSize(result.getLong(10));
-				song.setFileName(result.getString(11));
-				song.setLastModified(result.getLong(12));
-				
-				songs.add(song);
-			}
-			result.close();
+			return parseSong(result);
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError :" + ex);
+			System.out.println("SQLError (getSongsByYear) :" + ex);
 			return null;
 		}
-		return songs;	
 	}
 	
 	public Vector getAllSongs() {
-		Vector songs = new Vector();
 		try {
 			ResultSet result = getSongsStatement.executeQuery();
-			
+			return parseSong(result);
+		}
+		catch(SQLException ex) {
+			System.out.println("SQLError (getAllSongs) :" + ex);
+			return null;
+		}
+	}
+
+	public Vector getAllArtists() {
+		try {
+			ResultSet result = getArtistsStatement.executeQuery();
+			return parseArtist(result);
+		}
+		catch(SQLException ex) { 
+			System.out.println("SQLError (getAllArtists) : " + ex); 
+			return null;
+		}
+	}
+
+	public Vector getAllAlbums() {
+		try {
+			ResultSet result = getAlbumsStatement.executeQuery();
+			return parseAlbum(result);		
+		}
+		catch(SQLException ex) {
+			System.out.println("SQLError (getAllAlbums) : " + ex);
+			return null;
+		}
+	}
+
+	public Vector getAllGenres() {
+		try {
+			ResultSet result = getGenresStatement.executeQuery();
+			return parseGenre(result);
+		}
+		catch(SQLException ex) {
+			System.out.println("SQLError (getAllGenres) : " + ex);
+			return null;
+		}
+	}
+
+	public Vector getAllYears() {
+		try {
+			ResultSet result = getYearsStatement.executeQuery();
+			return parseYear(result);
+		}
+		catch(SQLException ex) {
+			System.out.println("SQLError (getAllYears) : " + ex);
+			return null;
+		}
+	}
+	
+	private Vector parseSong(ResultSet result) {
+		Vector songs = new Vector();
+		try {
 			while(result.next()) {
 				MP3Song song = new MP3Song();
 				song.setID(result.getInt(1));
@@ -249,83 +252,84 @@ public class SQLHandler implements DBHandler {
 				songs.add(song);
 			}
 			result.close();
+			songs.trimToSize();
+			return songs;
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError :" + ex);
+			System.out.println("SQLError (parseSong) :" + ex);
 			return null;
 		}
-		songs.trimToSize();
-		return songs;
 	}
 
-	public Vector getAllArtists() {
-		Vector artists = new Vector();
-		try {
-			ResultSet result = getArtistsStatement.executeQuery();
-			while(result.next()) {
-				MP3Artist artist = new MP3Artist(result.getString(2));
-				artist.setID(result.getInt(1));
-				artists.add(artist);
-			}
-			result.close();
-		}
-		catch(SQLException ex) { 
-			System.out.println("SQLError : " + ex); 
-			return null;
-		}
-		return artists;
-	}
-
-	public Vector getAllAlbums() {
+	private Vector parseAlbum(ResultSet result) {
 		Vector albums = new Vector();
 		try {
-			ResultSet result = getAlbumsStatement.executeQuery();
-			
 			while(result.next()) {
 				MP3Album a = new MP3Album();
 				a.setID(result.getInt(1));
 				a.setTitle(result.getString(2));
 				a.setArtist(result.getString(3));
 				a.setYear(result.getInt(4));
-				a.setCover("");
+				a.setGenre(result.getString(5));
+				a.setComplete(result.getInt(6));
+				a.setCover(result.getString(7));
 				
 				albums.add(a);
 			}
 			result.close();
+			albums.trimToSize();
+			return albums;		
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError : " + ex);
+			System.out.println("SQLError (parseAlbum) : " + ex);
 			return null;
 		}
-		return albums;		
 	}
-
-	public Vector getAllGenres() {
+	
+	private Vector parseArtist(ResultSet result) {
+		Vector artists = new Vector();
+		try {
+			while(result.next()) {
+				MP3Artist artist = new MP3Artist();
+				artist.setID(result.getInt(1));
+				artist.setName(result.getString(2));
+				artist.setGenre(result.getString(3));
+				artists.add(artist);
+			}
+			result.close();
+			artists.trimToSize();
+			return artists;
+		}
+		catch(SQLException ex) { 
+			System.out.println("SQLError (parseArtist) : " + ex); 
+			return null;
+		}
+	}
+	
+	private Vector parseGenre(ResultSet result) {
 		Vector genres= new Vector();
 		try {
-			ResultSet result = getGenresStatement.executeQuery();
-			
 			while(result.next()) {
 				MP3Genre y = new MP3Genre();
 				y.setID(result.getInt(1));
+				y.setGenre(result.getString(2));
 				y.setGenre(result.getString(3));
 				
 				genres.add(y);
 			}
 			result.close();
+			genres.trimToSize();
+			return genres;
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError : " + ex);
+			System.out.println("SQLError (parseGenre) : " + ex);
 			return null;
 		}
-		return genres;
 	}
 
-	public Vector getAllYears() {
+	private Vector parseYear(ResultSet result) {
 		Vector years = new Vector();
 		try {
-			ResultSet result = getYearsStatement.executeQuery();
-			
 			while(result.next()) {
 				MP3Year y = new MP3Year();
 				y.setID(result.getInt(1));
@@ -334,18 +338,19 @@ public class SQLHandler implements DBHandler {
 				years.add(y);
 			}
 			result.close();
+			years.trimToSize();
+			return years;
 		}
 		catch(SQLException ex) {
-			System.out.println("SQLError : " + ex);
+			System.out.println("SQLError (parseYear) : " + ex);
 			return null;
 		}
-		return years;
 	}
-
+	
 	private void prepareStatements() {
 		try {
 			// SONG Statements
-			getSongsStatement = 	dbConnection.prepareStatement(
+			getSongsStatement = dbConnection.prepareStatement(
 				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
@@ -396,22 +401,37 @@ public class SQLHandler implements DBHandler {
 			
 			// ARTIST Statements
 			getArtistsStatement = dbConnection.prepareStatement(
-				"SELECT id, name " +				"FROM artists " +				"ORDER BY name");
+				"SELECT id, name, genre " +				"FROM artists " +				"ORDER BY name");
+			getArtistByIDStatement = dbConnection.prepareStatement(
+					"SELECT id, name, genre " +
+					"FROM artists " +
+					"WHERE id = ?");
 			getArtistByNameStatement = dbConnection.prepareStatement(
-				"SELECT id, name " +				"FROM artists " +				"WHERE name = ?");
+				"SELECT id, name, genre " +				"FROM artists " +				"WHERE name = ?");
 			addArtistStatement = dbConnection.prepareStatement(
 				"INSERT INTO artists (id, name, genre) " +				"VALUES (?, ?, ?)");	
 
 			// ALBUM Statements
 			getAlbumsStatement = 	dbConnection.prepareStatement(
-				"SELECT albums.id, albums.name, artists.name, years.number, albums.cover "+
+				"SELECT albums.id, albums.name, artists.name, years.number, albums.genre, albums.complete, albums.cover "+
 				"FROM albums "+
 				"LEFT JOIN artists ON (artists.id = albums.artist) "+
 				"LEFT JOIN years ON (years.id = albums.year) " +				"ORDER BY albums.name");
 			addAlbumStatement = dbConnection.prepareStatement(
 				"INSERT INTO albums (id, name, artist, year, genre, complete, cover) " +				"VALUES (?, ?, ?, ?, ?, ?, ?)");
 			getAlbumByNameStatement = dbConnection.prepareStatement(
-				"SELECT id, name, artist " +				"FROM albums " +				"WHERE name = ?");
+				"SELECT albums.id, albums.name, artists.name, years.number, albums.genre, albums.complete, albums.cover "+
+				"FROM albums "+
+				"LEFT JOIN artists ON (artists.id = albums.artist) "+
+				"LEFT JOIN years ON (years.id = albums.year) " +
+				"WHERE albums.name = ?");
+			getAlbumByIDStatement = dbConnection.prepareStatement(
+				"SELECT albums.id, albums.name, artists.name, years.number, albums.genre, albums.complete, albums.cover "+
+				"FROM albums "+
+				"LEFT JOIN artists ON (artists.id = albums.artist) "+
+				"LEFT JOIN years ON (years.id = albums.year) " +
+				"WHERE albums.id = ? " +
+				"ORDER BY albums.name");
 
 			// YEAR Statements
 			getYearsStatement = dbConnection.prepareStatement(
@@ -425,7 +445,7 @@ public class SQLHandler implements DBHandler {
 			getGenresStatement = dbConnection.prepareStatement(
 				"SELECT id, number, genretext " +				"FROM genres " +				"ORDER BY genretext");
 			getGenreByNameStatement = dbConnection.prepareStatement(
-				"SELECT id, genretext " +				"FROM genres " +				"WHERE genretext = ?");
+				"SELECT id, number, genretext " +				"FROM genres " +				"WHERE genretext = ?");
 			addGenreStatement = dbConnection.prepareStatement(
 				"INSERT INTO genres (id, number, genretext) " +				"VALUES (?, ?, ?)");
 
@@ -494,7 +514,7 @@ public class SQLHandler implements DBHandler {
 
 		if(exist) {
 			// Change Song
-			//this.changeSong(newSong);
+			//changeSong(newSong);
 		}
 		else {
 			// Neuen MP3Song anlegen
@@ -585,16 +605,16 @@ public class SQLHandler implements DBHandler {
 			addSongStatement.setInt(5, yearId);
 			
 			// Album in der Datenbank suchen
-			// ï¿½berprï¿½fen ob ein Album eingetragen ist
+			// ueberpruefen ob ein Album eingetragen ist
 			if(song.getAlbum().length() > 1) {
 				getAlbumByNameStatement.setString(1, song.getAlbum());
 				ResultSet albums = getAlbumByNameStatement.executeQuery();
 				
-				// Falls Album vorhanden, ID ï¿½bernehmen
+				// Falls Album vorhanden, ID uebernehmen
 				if(albums.next()) {
 					albumId = albums.getInt(1);
 				}
-				// Wenn nicht vorhanden, anlegen und ID ï¿½bernehmen
+				// Wenn nicht vorhanden, anlegen und ID uebernehmen
 				else {
 					albumId = getMaxAlbumId()+1;
 					addAlbumStatement.setInt(1, albumId);
@@ -608,23 +628,22 @@ public class SQLHandler implements DBHandler {
 				}
 				albums.close();
 			}
-			// Falls kein Albumeintrag vorhanden
 			else {
-				// Vorerst mal leer
+				// Falls kein Albumeintrag vorhanden
 			}
 			addSongStatement.setInt(4, albumId);
 
 			// Genre in der Datenbank suchen
-			// ï¿½berprï¿½fen ob ein Genre eingetragen ist
+			// ueberpruefen ob ein Genre eingetragen ist
 			if(song.getGenre().length() > 1) {
 				getGenreByNameStatement.setString(1, song.getGenre());
 				ResultSet genres = getGenreByNameStatement.executeQuery();
 				
-				// Falls Genre vorhanden, ID ï¿½bernehmen
+				// Falls Genre vorhanden, ID uebernehmen
 				if(genres.next()) {
 					genreId = genres.getInt(1);
 				}
-				// Wenn nicht vorhanden, anlegen und ID ï¿½bernehmen
+				// Wenn nicht vorhanden, anlegen und ID uebernehmen
 				else {
 					genreId = getMaxGenreId()+1;
 					addGenreStatement.setInt(1, genreId);
@@ -634,9 +653,8 @@ public class SQLHandler implements DBHandler {
 				}
 				genres.close();
 			}
-			// Falls kein Genreeintrag vorhanden
 			else {
-				// Vorerst mal leer
+				// Falls kein Genreeintrag vorhanden
 			}
 			
 			addSongStatement.setInt(6, genreId);
@@ -652,7 +670,7 @@ public class SQLHandler implements DBHandler {
 			addSongStatement.clearParameters();
 		}
 		catch(SQLException ex) {
-			System.out.println(ex);
+			System.out.println("SQLError (addSong) : " + ex);
 		}
 	}
 	
