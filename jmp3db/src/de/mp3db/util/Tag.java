@@ -47,6 +47,7 @@ public class Tag {
 	
 	public Tag(String file) {
 		this.parseTag(file);
+		
 	}
 
 	private void parseTag(String fileName) {
@@ -54,9 +55,9 @@ public class Tag {
 		codec = MP3;
 			try {
 				MP3File file = new MP3File(new File(fileName));
-				title = file.getTitle();
-				artist = file.getArtist();
-				album = file.getAlbum();
+				title = new String(file.getTitle());
+				artist = new String(file.getArtist());
+				album = new String(file.getAlbum());
 				try {
 					year = Integer.parseInt(file.getYear());
 				}
@@ -68,7 +69,7 @@ public class Tag {
 				bitrate = file.getBitRate();
 				length = (int)file.getPlayingTime();
 				fileSize = file.getFileSize();
-				this.fileName = fileName;
+				this.fileName = new String(fileName);
 				lastModified = new File(fileName).lastModified();
 				
 			}
