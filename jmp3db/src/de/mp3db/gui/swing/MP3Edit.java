@@ -87,6 +87,8 @@ public class MP3Edit extends JTabbedPane implements MP3MultiPanel {
 	}
 
 	private void initMP3Frame() {
+		searchButton.setActionCommand("Search");
+		searchButton.addActionListener(listener);
 		genreCombo.setEditable(true);
 		filenameField.setEnabled(false);
 		save.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/Save16.gif")));
@@ -164,7 +166,7 @@ public class MP3Edit extends JTabbedPane implements MP3MultiPanel {
 	public void editSong(MP3Song song) {
 		tmp = new MP3Song(song);
 		if(song != null) {
-			if(song.getTrackNo() > 1) {
+			if(song.getTrackNo() > 0) {
 				trackField.setText(String.valueOf(song.getTrackNo()));
 			}
 			titleField.setText(song.getTitle());
@@ -212,5 +214,9 @@ public class MP3Edit extends JTabbedPane implements MP3MultiPanel {
 	public void resetEdit() {
 		this.clearEditFields();
 		this.editSong(tmp);
+	}
+	
+	public String getSearchString() {
+		return searchField.getText();
 	}
 }
