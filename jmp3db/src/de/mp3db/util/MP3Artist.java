@@ -4,20 +4,15 @@ package de.mp3db.util;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: MP3Artist.java,v 1.1 2004/08/19 12:54:22 einfachnuralex Exp $
+ *      @version $Id: MP3Artist.java,v 1.2 2004/08/25 09:50:07 einfachnuralex Exp $
  *  
  *      $Log: MP3Artist.java,v $
+ *      Revision 1.2  2004/08/25 09:50:07  einfachnuralex
+ *      Genre Feld und passende Methoden hinzugefügt
+ *      Konstruktor von MP3Artist(String) zu MP3Artist() geändert
+ *
  *      Revision 1.1  2004/08/19 12:54:22  einfachnuralex
  *      Add to CVS
- *
- *      Revision 1.4  2003/03/10 08:14:36  stefan
- *      SQL: addSongs funktionsfähig
- *<br>
- *      Revision 1.3  2003/01/02 08:25:10  stefan<br>
- *      Änderungen in equals-Methode<br>
- *		<br>
- *      Revision 1.2  2002/11/05 14:08:35  stefan<br>
- *      - Bugfix in "equals()"<br>
  *
  */
 public class MP3Artist implements java.util.Comparator
@@ -26,14 +21,14 @@ public class MP3Artist implements java.util.Comparator
     private String	name;
     private String	genre;
     
-    /**		Konstruktor
+    /**	Konstruktor
      * 		@param name Name des Artists
      */
-    public MP3Artist(String name) {
-        this.name = name;
+    public MP3Artist() {
+
     }
     
-    /**		Setzt die ID des Artists
+    /**	Setzt die ID des Artists
      * 		@param id ID des Artists
      */
     public void setID(int id) {
@@ -47,24 +42,30 @@ public class MP3Artist implements java.util.Comparator
         return this.ID;
     }
     
-    /**		Setzt den Namen des Artists
+    /**	Setzt den Namen des Artists
      * 		@param name Name des Artists
      */
     public void setName(String name) {
         this.name = name;
     }
     
-    /**		Gibt den Namen des Artists zurück
+    /**	Gibt den Namen des Artists zurück
      * 		@return Name des Artists
      */
     public String getName() {
         return this.name;
     }
-    
+
+    /**	Setzt das Genre des Artist
+     * 		@param Genre
+     */
     public void setGenre(String genre) {
         this.genre = genre;
     }
     
+    /**	Gibt das Genre des Artist zurück
+     * 		@return Genre
+     */
     public String getGenre() {
         return this.genre;
     }
