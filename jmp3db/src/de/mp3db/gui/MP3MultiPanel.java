@@ -18,4 +18,8 @@ public interface MP3MultiPanel {
 	
 	public void resetEdit();
 	
+	public MP3Song getChangedSong();
+	
+	public String getSearchString();
+	
 }
