@@ -6,8 +6,17 @@ import helliker.id3.MP3File;
 
 import java.io.File;
 
-/**
- * @author alex
+/**     Klasse dient zum auslesen der TAG Informationen
+ *      
+ *      @author $Author: einfachnuralex $
+ *
+ *      @version $Id: Tag.java,v 1.3 2004/08/24 12:48:04 einfachnuralex Exp $
+ *  
+ *      $Log: Tag.java,v $
+ *      Revision 1.3  2004/08/24 12:48:04  einfachnuralex
+ *      CVS Kommentare eingefügt
+ *      parseTag(String) geändert
+ *
  *
  */
 public class Tag {
@@ -51,7 +60,7 @@ public class Tag {
 	}
 
 	private void parseTag(String fileName) {
-		if(fileName.endsWith(".mp3")) {
+		if(fileName.substring(fileName.length()-4, fileName.length()).equalsIgnoreCase(".mp3")) {
 		codec = MP3;
 			try {
 				MP3File file = new MP3File(new File(fileName));
@@ -77,7 +86,7 @@ public class Tag {
 				System.out.println(ex);
 			}
 		}
-		else if(fileName.endsWith(".ogg")) {
+		else if(fileName.substring(fileName.length()-4, fileName.length()).equalsIgnoreCase(".ogg")) {
 			
 		}
 		 		
