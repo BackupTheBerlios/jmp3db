@@ -16,8 +16,18 @@ import de.mp3db.util.MP3Song;
 import de.mp3db.util.MP3Year;
 import de.mp3db.util.Tag;
 
-/**
- * @author alex
+/**     Klasse repräsentiert das SQL Datenbank Interface
+ *      
+ *      @author $Author: einfachnuralex $
+ *
+ *      @version $Id: SQLHandler.java,v 1.3 2004/08/24 12:45:33 einfachnuralex Exp $
+ *  
+ *      $Log: SQLHandler.java,v $
+ *      Revision 1.3  2004/08/24 12:45:33  einfachnuralex
+ *      CVS Kommentare eingefügt
+ *      addSong(MP3Song)
+ *      SQL Querys überarbeitet
+ *
  *
  */
 public class SQLHandler implements DBHandler {
@@ -75,23 +85,14 @@ public class SQLHandler implements DBHandler {
         }
 	}
 
-	/**
-	 * @see de.mp3db.db.DBHandler#getSong(int)
-	 */
 	public MP3Song getSong(int id) {
 		return null;
 	}
 
-	/**
-	 * @see de.mp3db.db.DBHandler#getArtist(int)
-	 */
 	public MP3Artist getArtist(int id) {
 		return null;
 	}
 
-	/**
-	 * @see de.mp3db.db.DBHandler#getAlbum(int)
-	 */
 	public MP3Album getAlbum(int id) {
 		return null;
 	}
@@ -222,9 +223,6 @@ public class SQLHandler implements DBHandler {
 		return songs;	
 	}
 	
-	/**
-	 * @see de.mp3db.db.DBHandler#getAllSongs()
-	 */
 	public Vector getAllSongs() {
 		Vector songs = new Vector();
 		try {
@@ -257,9 +255,6 @@ public class SQLHandler implements DBHandler {
 		return songs;
 	}
 
-	/**
-	 * @see de.mp3db.db.DBHandler#getAllArtists()
-	 */
 	public Vector getAllArtists() {
 		Vector artists = new Vector();
 		try {
@@ -278,9 +273,6 @@ public class SQLHandler implements DBHandler {
 		return artists;
 	}
 
-	/**
-	 * @see de.mp3db.db.DBHandler#getAllAlbums()
-	 */
 	public Vector getAllAlbums() {
 		Vector albums = new Vector();
 		try {
@@ -367,14 +359,14 @@ public class SQLHandler implements DBHandler {
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
 				"LEFT JOIN years ON (songs.year = years.id) " +
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
-				"WHERE songs.id = ? " +				"ORDER BY 2");
+				"WHERE songs.id = ? " +				"ORDER BY songs.title");
 			getSongsByArtistStatement = dbConnection.prepareStatement("" +				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
 				"LEFT JOIN artists ON (songs.artist = artists.id) " +
 				"LEFT JOIN years ON (songs.year = years.id) " +
 				"LEFT JOIN genres ON (songs.genre = genres.id) " +
-				"WHERE songs.artist = ? " +				"ORDER BY 3 ASC"); 
+				"WHERE songs.artist = ? " +				"ORDER BY songs.title ASC"); 
 			getSongsByAlbumStatement = dbConnection.prepareStatement("" +				"SELECT songs.id, songs.title, artists.name, albums.name, years.number, genres.genretext, songs.trackno, songs.bitrate, songs.length, songs.filesize, songs.filename, songs.lastmodified "+ 
 				"FROM songs "+
 				"LEFT JOIN albums ON (songs.album = albums.id) "+
@@ -530,12 +522,16 @@ public class SQLHandler implements DBHandler {
 		
 		try {
 			addSongStatement.setInt(1, song.getID());
+			
+			if(song.getTitle().length() < 1) {
+				String tmp = (((new File(song.getFileName())).getName()));
+				song.setTitle(tmp.substring(0, tmp.length()-4));
+			}
 			addSongStatement.setString(2, song.getTitle());
 			
 			// Artist in der Datenbank suchen
 			// ueberpruefen ob ein Artist eingetragen ist
 			if(song.getArtist().length() > 1) {
-				// System.out.println(song.getArtist() + " : " + song.getArtist().length());
 				getArtistByNameStatement.setString(1, song.getArtist());
 				ResultSet artists = getArtistByNameStatement.executeQuery();
 				
@@ -553,6 +549,8 @@ public class SQLHandler implements DBHandler {
 				}
 				artists.close();
 			}
+			
+			/*
 			// Falls kein Artist vorhanden, 
 			else {
 				getArtistByNameStatement.setString(1, "Unknown");
@@ -572,6 +570,7 @@ public class SQLHandler implements DBHandler {
 				}
 				artists.close();
 			}
+			*/
 			addSongStatement.setInt(3, artistId);
 			
 			// Jahr in der Datenbank suchen
@@ -667,9 +666,6 @@ public class SQLHandler implements DBHandler {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.mp3db.db.DBHandler#changeSong(de.mp3db.util.MP3Song)
-	 */
 	public void changeSong(MP3Song changedSong) {
 		// TODO Auto-generated method stub
 
