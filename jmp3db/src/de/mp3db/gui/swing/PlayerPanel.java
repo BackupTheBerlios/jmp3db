@@ -95,7 +95,7 @@ public class PlayerPanel extends JPanel implements MP3PlayerPanel {
 	}
 	
 	public synchronized void setBarPos(int pos, int max) {
-		if(max != progressBar.getMaximum()) {
+		if(max != progressBar.getMaximum() && max != -1) {
 			progressBar.setMaximum(max);
 		}
 		progressBar.setValue(pos);
