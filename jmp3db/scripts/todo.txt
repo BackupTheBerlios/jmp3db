@@ -21,6 +21,8 @@
 
 @DB:
 
+DBHandler & SQLDBHandler überarbeiten
+
 Methode changeSong() implementieren
 
 Methoden um Artist, Album, Genre und Year zu ändern und hinzuzufügen
