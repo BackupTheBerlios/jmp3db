@@ -4,27 +4,24 @@ package de.mp3db.util;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: MP3Album.java,v 1.1 2004/08/19 12:54:22 einfachnuralex Exp $
+ *      @version $Id: MP3Album.java,v 1.2 2004/08/25 09:51:53 einfachnuralex Exp $
  *  
  *      $Log: MP3Album.java,v $
+ *      Revision 1.2  2004/08/25 09:51:53  einfachnuralex
+ *      Complete Feld und passende Methoden hinzugefügt
+ *
  *      Revision 1.1  2004/08/19 12:54:22  einfachnuralex
  *      Add to CVS
  *
- *      Revision 1.3  2003/01/02 08:25:10  stefan
- *      Änderungen in equals-Methode
- *
- *      Revision 1.2  2002/11/05 14:08:35  stefan
- *      - Bugfix in "equals()"
- *
  */
-public class MP3Album implements java.util.Comparator
-{
+public class MP3Album implements java.util.Comparator {
     private int		ID;
     private String	title;
     private String	artist;
     private int		year;
     private String	genre;
     private String	cover;
+    private int 		complete;
     
     public MP3Album() {
     }
@@ -81,6 +78,14 @@ public class MP3Album implements java.util.Comparator
     
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public void setComplete(int complete) {
+        this.complete = complete;
+    }
+    
+    public int getComplete() {
+        return this.complete;
     }
     
     /***************************************************************************
