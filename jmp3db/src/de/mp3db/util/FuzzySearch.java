@@ -8,9 +8,12 @@ package de.mp3db.util;
  * 
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: FuzzySearch.java,v 1.1 2004/10/28 14:32:11 einfachnuralex Exp $
+ *      @version $Id: FuzzySearch.java,v 1.2 2004/10/29 11:00:27 einfachnuralex Exp $
  *  
  *      $Log: FuzzySearch.java,v $
+ *      Revision 1.2  2004/10/29 11:00:27  einfachnuralex
+ *      getResult Methode hinzugefügt
+ *
  *      Revision 1.1  2004/10/28 14:32:11  einfachnuralex
  *      Add to CVS
  *
@@ -18,8 +21,9 @@ package de.mp3db.util;
  */
 public class FuzzySearch {
 	private int MaxParLen = 1000;
-	
+	private double   Similarity = 0.0;
 	private int maxMatch;	
+	private int min;
 	
 	public FuzzySearch(String searchBuffer, String searchString, int threshold) {
 		char[] textPara = new char[MaxParLen];
@@ -29,8 +33,8 @@ public class FuzzySearch {
 		int    MatchCount1, MatchCount2;
 		int    MaxMatch1 = 0; 
 		int 	MaxMatch2 = 0;
-		double   Similarity = 0.0;
 		
+		min = threshold;
 		searchStr = prepareString(searchString);
 		searchStrLen = searchString.length();
 		
@@ -50,8 +54,13 @@ public class FuzzySearch {
         Similarity = 100.0 * (double)(MatchCount1 + MatchCount2) / (double)(MaxMatch1 + MaxMatch2);
 		
         if(Similarity > threshold) {
-        	System.out.println(Similarity + "  " + String.valueOf(textPara));
+        	System.out.println(searchString + ": " + Similarity + "  " + String.valueOf(textPara));
         }
+	}
+	
+	public double getResult() {
+		if(Similarity > min) return Similarity;
+		else	return 0.0;
 	}
 	
 	private int NGramMatch(char[] textPara, char[] searchString, int searchStrLen, int NGramLen) {
