@@ -18,12 +18,22 @@
 
 // 27.06.04/19:55 : MP3Edit Methoden zum Speichern und Reset hinzugefügt
 
+// 25.08.04/15:00 : VorbisInfo in Projekt integriert - Ogg Support
+
+// 25.08.04/15:30 : Ogg Support in Tag.java
+
+// 25.08.04/17:00 : Methode changeSong() implementieren
+
+// 13.10.04/13:00 : Umstieg auf Basicplayer2.3 API von javazoom.net
 
 @DB:
 
+!! - addSong und changeSong die Möglichkeit geben mehrere gleichnamige Alben anlegen zu können, aber mit unterschiedlichen Interpreten
+!! - changeSong soll Artist und Album ändern können
+
 DBHandler & SQLDBHandler überarbeiten
 
-Methode changeSong() implementieren
+Methode changeSong() überarbeiten / überdenken
 
 Methoden um Artist, Album, Genre und Year zu ändern und hinzuzufügen
 
@@ -41,8 +51,6 @@ Implementation von SeekBar
 	- Umrechnung des Points in die Scala der Progressbar
 
 Möglichkeit um Playlists zu laden/speichern
-
-Umstieg auf neuen Basicplayer von javazoom
 
 @Mainlist / Playlist Table:
 
@@ -79,3 +87,4 @@ Suchfunktion implementieren
 @ Off Topic
 
 SQL Query Generator
+Ogg Info Libary
