@@ -39,4 +39,8 @@ public class MultiPanel {
 	public void resetEdit() {
 		panel.resetEdit();
 	}
+	
+	public MP3Song changedSong() {
+		return panel.getChangedSong();
+	}
 }
