@@ -13,9 +13,12 @@ import java.io.IOException;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: Tag.java,v 1.6 2004/09/01 09:26:33 einfachnuralex Exp $
+ *      @version $Id: Tag.java,v 1.7 2004/10/29 10:58:34 einfachnuralex Exp $
  *  
  *      $Log: Tag.java,v $
+ *      Revision 1.7  2004/10/29 10:58:34  einfachnuralex
+ *      Debugmethoden auskommentiert
+ *
  *      Revision 1.6  2004/09/01 09:26:33  einfachnuralex
  *      parseGenre(String) implementiert
  *
@@ -48,7 +51,7 @@ public class Tag {
 			"Dance Hall", "unknown"};
 	
 	public Tag(MP3Song newSong) {
-		song = newSong;
+		song = new MP3Song(newSong);
 	}
 	
 	public Tag(String file) {
@@ -76,7 +79,7 @@ public class Tag {
 					song.setYear(0);
 				}
 				int genreNo = parseGenre(file.getGenre());
-				System.out.println(file.getGenre() + " " + genreNo + " " + file.getTitle());
+				//System.out.println(file.getGenre() + " " + genreNo + " " + file.getTitle());
 				if(genreNo != 0) {
 					song.setGenre(GENRES[genreNo]);
 					song.setGenre(genreNo);
@@ -117,7 +120,7 @@ public class Tag {
 				}
 				if(vorbis.getComments("genre") != null) {
 					int genreNo = parseGenre((String)vorbis.getComments("genre").get(0));
-					System.out.println((String)vorbis.getComments("genre").get(0) + " " + genreNo + " " + (String)vorbis.getComments("title").get(0));
+					//System.out.println((String)vorbis.getComments("genre").get(0) + " " + genreNo + " " + (String)vorbis.getComments("title").get(0));
 					if(genreNo != 0) {
 						song.setGenre(GENRES[genreNo]);
 						song.setGenre(genreNo);
