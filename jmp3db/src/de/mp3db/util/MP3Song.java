@@ -6,9 +6,13 @@ import java.util.Comparator;
  *      
  *      @author $Author: einfachnuralex $
  *
- *      @version $Id: MP3Song.java,v 1.2 2004/08/19 14:09:56 einfachnuralex Exp $
+ *      @version $Id: MP3Song.java,v 1.3 2004/09/01 09:28:02 einfachnuralex Exp $
  *  
  *      $Log: MP3Song.java,v $
+ *      Revision 1.3  2004/09/01 09:28:02  einfachnuralex
+ *      Feld int genreNo hinzugefügt
+ *      kompett überarbeitet
+ *
  *      Revision 1.2  2004/08/19 14:09:56  einfachnuralex
  *      CVS Kommentare hinzugefügt
  *
@@ -26,6 +30,7 @@ public class MP3Song implements Comparator {
     private String  album;
     private int     year;
     private String  genre;
+    private int	genreNo;
     private int     trackNo;
     private int     bitrate;
     private int     length;
@@ -41,11 +46,20 @@ public class MP3Song implements Comparator {
         title = "";
         artist = "";
         album = "";
+        year = 0;
         genre = "";
+        trackNo = 0;
+        bitrate = 0;
+        length = 0;
+        fileSize = 0;
         fileName = "";
+        lastModified = 0;
+        hashCode = 0;
+        codec = 0;
     }
 
     public MP3Song(MP3Song newSong) {
+    	this.ID = newSong.getID();
 		this.title = newSong.getTitle();
 		this.artist = newSong.getArtist();
 		this.album = newSong.getAlbum();
@@ -56,141 +70,124 @@ public class MP3Song implements Comparator {
 		this.length = newSong.getLength();
 		this.fileSize =newSong.getFileSize();
 		this.fileName = newSong.getFileName();
+		this.lastModified = newSong.getLastModified();
+		this.hashCode = newSong.getHashCode();
+		this.codec = newSong.getCodec();
     }
     
-    public void setTitle(String title)
-    {
+    public void setTitle(String title) {
         this.title = title;
     }
     
-    public void setID(int id)
-    {
+    public void setID(int id) {
         this.ID = id;
     }
     
-    public int getID()
-    {
+    public int getID() {
         return this.ID;
     }
     
-    public String getTitle()
-    {
+    public String getTitle() {
         return this.title;
     }
     
-    public void setArtist(String artist)
-    {
+    public void setArtist(String artist) {
         this.artist = artist;
     }
     
-    public String getArtist()
-    {
+    public String getArtist() {
         return this.artist;
     }
     
-    public void setAlbum(String album)
-    {
+    public void setAlbum(String album) {
         this.album = album;
     }
     
-    public String getAlbum()
-    {
+    public String getAlbum() {
         return this.album;
     }
     
-    public void setYear(int year)
-    {
+    public void setYear(int year) {
         this.year = year;
     }
     
-    public int getYear()
-    {
+    public int getYear() {
         return this.year;
     }
     
-    public void setGenre(String genre)
-    {
+    public void setGenre(String genre) {
         this.genre = genre;
     }
     
-    public String getGenre()
-    {
+    public String getGenre() {
         return this.genre;
     }
     
-    public void setTrackNo(int trackNo)
-    {
+    public void setGenre(int genre) {
+        this.genreNo = genre;
+    }
+    
+    public int getGenreNo() {
+        return this.genreNo;
+    }
+
+    public void setTrackNo(int trackNo) {
         this.trackNo = trackNo;
     }
     
-    public int getTrackNo()
-    {
+    public int getTrackNo() {
         return this.trackNo;
     }
     
-    public void setBitrate(int bitrate)
-    {
+    public void setBitrate(int bitrate) {
         this.bitrate = bitrate;
     }
     
-    public int getBitrate()
-    {
+    public int getBitrate() {
         return this.bitrate;
     }
     
-    public void setLength(int length)
-    {
+    public void setLength(int length) {
         this.length = length;
     }
     
-    public int getLength()
-    {
+    public int getLength() {
         return this.length;
     }
     
-    public void setFileSize(long fileSize)
-    {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
     
-    public long getFileSize()
-    {
+    public long getFileSize() {
         return this.fileSize;
     }
     
-    public void setFileName(String fileName)
-    {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
     
-    public String getFileName()
-    {
+    public String getFileName() {
         return this.fileName;
     }
     
-    public void setLastModified(long lastModified)
-    {
+    public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
     }
     
-    public long getLastModified()
-    {
+    public long getLastModified() {
         return this.lastModified;
     }
     
-    public void setHashCode(int hashCode)
-    {
+    public void setHashCode(int hashCode) {
         this.hashCode = hashCode;
     }
     
-    
-    public int getHashCode()
-    {
+    public int getHashCode() {
         return this.hashCode;
     }
     
-    public int hashCode()
-    {
+    public int hashCode() {
     	int code = 0;
     	code = 37 * code + title.hashCode();
     	code = 37 * code + artist.hashCode();
@@ -218,23 +215,21 @@ public class MP3Song implements Comparator {
     /**********************************************************************************
      * (alphabetischer) Vergleicht zweier MP3Songs<p>
      *********************************************************************************/          
-    public int compare(Object o1, Object o2)
-    {   
-        try
-        {
+    public int compare(Object o1, Object o2) {   
+        try {
             MP3Song song1 = (MP3Song)o1;
             MP3Song song2 = (MP3Song)o2;
             return song1.getTitle().compareTo(song2.getTitle());
         }
-        catch(Exception e) { }
-        return 0;
+        catch(Exception e) { 
+            return 0;        	
+        }
     }
     
     /************************************************************************************
      * Zwei Songs sind dann identisch, wenn sie in allen Attributen übereinstimmen
      ***********************************************************************************/
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if(!(obj instanceof MP3Song))
             return false;
             
@@ -249,8 +244,7 @@ public class MP3Song implements Comparator {
             this.bitrate == song.getBitrate() &&
             this.length == song.getLength() &&
             this.fileSize == song.getFileSize() &&
-            this.fileName.equals(song.getFileName()))
-        {
+            this.fileName.equals(song.getFileName())) {
             return true;
         }            
         return false;
@@ -259,9 +253,7 @@ public class MP3Song implements Comparator {
     /**********************************************************************************
      * Überschreiben von java.lang.Object.toString();
      *********************************************************************************/
-    public String toString()
-    { 
+    public String toString() { 
         return this.title;
     }
-
 }
