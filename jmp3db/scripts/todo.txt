@@ -1,0 +1,79 @@
+@jmp3db TODO:
+
+// 18.01.04/16:00 : EventListener auslagern -> Mögliche Nutzung von SWT
+
+// 18.01.04/19:00 : Handhabung der Genres implementieren
+
+// 22.01.04/18:30 : GUI modularisieren -> Mögliche Nutzung von SWT
+
+// 22.01.04/18:30 : Interfaces für GUI erstellen -> Mögliche Nutzung von SWT / Modularisierung
+
+// 23.01.04/14:00 : MouseListener in Mainlist, Playlist & (Player)
+
+// 23.01.04/18:00 : Fortschrittsbalken für Player implementiert
+
+// Wird nicht implementiert : Daten in MP3TableModel speichern
+
+// 27.06.04/19:30 : Klasse de.mp3db.util.Tag hinzugefügt / Represent. Music Tag (Mp3/Ogg/usw.)
+
+// 27.06.04/19:55 : MP3Edit Methoden zum Speichern und Reset hinzugefügt
+
+
+@DB:
+
+Methode changeSong() implementieren
+
+Methoden um Artist, Album, Genre und Year zu ändern und hinzuzufügen
+
+Playlisten in DB Schema übernehmen +
+Methoden um Playlisten in DB zu verwalten (add, remove, change)
+
+
+@Player / Playlist:
+
+// Vorläufige Implementierung von javazoom.jlGui.BasicPlayer - 
+//	Umstieg auf javazoom.jl.player.advanced.AdvancedPlayer
+
+Implementation von SeekBar
+	- Möglichkeit über JComponent.getWidth() und JComponent.getX() / MouseEvent
+	- Umrechnung des Points in die Scala der Progressbar
+
+Möglichkeit um Playlists zu laden/speichern
+
+Umstieg auf neuen Basicplayer von javazoom
+
+@Mainlist / Playlist Table:
+
+Eventuell Kontext Menü
+
+Playlist Export/Import
+
+Mainlist Kontext:
+	- Song direkt abspielen
+	- Song zu einer Playlist hinzufügen
+	- Alle Songs in PlaylistTable einfügen
+	- Song Infos
+	
+Playlist Kontext:
+	- ???
+
+DBTree Kontext:
+	- MP3Artist, MP3Album, MP3Year, MP3Genre ändern
+
+@ DBTree
+
+- Rubriken hinzufügen
+	- Playlist
+	- Suchergebnisse
+
+@GUI:
+
+Scan Wizard erstellen / optimieren
+
+Panel für MP3 Änderungen, Suche mit Reitern unter der Mainlist / fertigstellen
+
+Suchfunktion implementieren
+
+@ Off Topic
+
+SQL Query Generator

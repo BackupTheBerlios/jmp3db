@@ -1,0 +1,11 @@
+bin
+config
+data
+doc
+lib
+log
+.classpath
+.project
+jmp3db.bat
+jmp3db.jar
+jmp3db.sh
