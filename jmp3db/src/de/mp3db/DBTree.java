@@ -143,6 +143,7 @@ public class DBTree {
 	public void scan(File root) {
 		Vector ext = new Vector();
 		ext.add(new String(".mp3"));
+		ext.add(new String(".ogg"));
 		Scanner sn = new Scanner(dbHandler, scan, root, ext);
 		sn.start();
 	}
