@@ -165,7 +165,10 @@ public class DBTree {
 			Tag file = new Tag(changedSong);
 			if(file.writeTag()) {
 				dbHandler.changeSong(changedSong);
-			}	
+			}
+			else {
+				System.out.println("ID3Tag konnte nicht geschrieben werden : " + changedSong.getFileName());
+			}
 		}
 	}
 	
